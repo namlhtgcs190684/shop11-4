@@ -3,9 +3,11 @@
 
 /// ------------------ Khai bao LIB de su dung
 var express = require('express');
+const bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieSession = require('cookie-session');
 var cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 var router = express.Router();
 
 var mongodb = require('mongodb');
@@ -23,7 +25,7 @@ var atob = require('atob');
 /// ------------------ CONFIG
 var configHeader = require("./configs/config_Header");
 var configDB = require("./configs/config_DB");
-const PORT = process.env.PORT || 8080 ;
+const PORT = 8081;
 var urldb = configDB.localdb.urldb;
 
 
@@ -33,6 +35,7 @@ var libDB = require("./libs/libDB_Query");
 /// ------------------ Khai bao cac Folder Tĩnh, Session, Cookies
 app.use(express.static('public'));
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({extended: true}));   
 /// session
 app.use(session({
     resave: true, 
@@ -58,6 +61,21 @@ app.use('/admin', adminControl);
 
 var productControl = require('./controllers/product');
 app.use('/product', productControl);
+productControl.params = { configHeader: configHeader, configDB: configDB};
+
+var uploadControl = require('./controllers/upload');
+app.use('/upload', uploadControl);
+uploadControl.params = { configHeader: configHeader, configDB: configDB};
+
+var paymentControl = require('./controllers/payment');
+app.use('/payment', paymentControl);
+paymentControl.params = { configHeader: configHeader, configDB: configDB};
+
+var login = require('./controllers/login');
+app.use('/login',login);
+// Body parser Middleware
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
 
 /// ------------------ Khai bao cac Control, hàm , ... 
 /// ..................................................
@@ -105,64 +123,34 @@ function chattingPage(req, res) {
 app.get('/order', orderPage);
 function orderPage(req, res) {
     var xcontent = "";
-
-    console.log('\t ... get ORDER INF ! ');
+        console.log('\t ... get ORDER INF ! ');
 
     var strtext = req.cookies.cart_itemlist;
+    console.log('1 ',strtext);
     xcontent += "<BR><p> " + strtext + "</p>";
     //
     strtext = atob(strtext);
+    console.log('1 ',strtext);
     xcontent += "<BR>atob <p> " + strtext + "</p>";
     //
     strtext = escape(strtext);
+    console.log('1 ',strtext);
     xcontent += "<BR>escape <p> " + strtext + "</p>";
     //
     strtext = decodeURIComponent(strtext);
+    console.log('1 ',strtext);
     xcontent += "<BR>decodeURIComponent <p> " + strtext + "</p>";
     ///
     var itemlist  = JSON.parse(strtext);
-
     console.log("\n\t ", xcontent);
     
     res.render("pages/order", {title: "ATN-Shop ORDER page", 
         content: xcontent , itemlist: itemlist,  // Object.values(itemlist)
         configHeader: configHeader  , currpage: "Order"  });
-
 }
-
 
 
 /// ..................................................
-app.get('/product', productPage);
-function productPage(req, res) {
-    
-    if (session.user) 
-    {
-        MongoClient.connect(urldb, { useUnifiedTopology: true }, function(err, db) {
-            if (err) throw err;
-            var dbo = db.db("toyshop");
-            dbo.collection("product").find({}).toArray(function(err, productlist) {
-              if (err) throw err;
-              
-                res.render("pages/product-list",  {
-                    title: "ATN-Shop PRODUCT page", 
-                    username: session.user.username,
-                    products : productlist 
-                    , configHeader: configHeader , currpage: "Product"
-                    });
-                console.log('Found:', productlist);
-
-              db.close();
-            });
-          });
-                    
-
-        
-    } else {
-        res.redirect('/login');
-    }    
-    console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
-}
 
 /// ..................................................
 app.get('/user/create', createUserPage);
@@ -174,7 +162,7 @@ function createUserPage(req, res) {
                 password : req.query.password.trim()
             };
             session.user = accsubmit;
-            libDB.res_insertDB(MongoClient, urldb, "toyshop", "user",
+            libDB.res_insertDB(MongoClient, urldb, "toyshop", "Create-user",
                 accsubmit, "pages/user_create", {title: "ATN-Shop create USER page" , configHeader: configHeader , currpage: "create User"}, "Notify", res );
             console.log("\t create ", accsubmit);
         } else {
@@ -185,6 +173,45 @@ function createUserPage(req, res) {
         res.redirect('/login');
     }
 }
+app.get('/feedback', (req,res) => {
+    res.render("pages/feedback",  {title: "ATN-Shop feedback page",msg:'', configHeader: configHeader, currpage: "Feedback" });  
+});
+app.post('/send' ,(req,res) => {
+    var name = req.body.name;
+    var subject = req.body.subject;
+    var email = req.body.email;
+    var password = req.body.password;
+    var phone = req.body.phone;
+    var message = req.body.message;
+    require('dotenv').config();
+
+const   mailer = require('nodemailer');
+const log = console.log;
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: email , // abcdefghjk2707@gmail.com
+        pass: password // TODO: your gmail password P12345678
+    }
+});
+let mailOptions = {
+    from: email, // TODO: email sender
+    to: 'nguyenphuc12a6@gmail.com' , // TODO: email receiver
+    subject: subject,
+    text: 'Họ và Tên: ' + name + ' Số điện thoại: ' + phone + '\n' + message
+};
+transporter.sendMail(mailOptions, (err, data) => {
+    if (err) {
+        return log('Error occurs' + err);
+    }else{
+        res.render("pages/feedback",  {title: "ATN-Shop feedback page",msg:"Feedback thành công!!!", configHeader: configHeader, currpage: "Feedback" });  
+        return log('Email sent!!!');
+    }
+    
+});
+   
+    
+});
 
 /// ..................................................
 app.get('/login', loginPage);
@@ -198,8 +225,34 @@ function loginPage(req, res) {
                 password : req.query.password.trim()
             };
             session.user = accsubmit;
-            res.redirect('/');
-            console.log(accsubmit);
+            /// npm install mongodb mongoose --save
+
+ var mongoose = require('mongoose');
+ var User = require('./models/user');
+
+ const querysql = accsubmit;
+ console.log(querysql);
+ 
+ mongoose.connect(urldb, { useNewUrlParser: true, useUnifiedTopology: true },
+ function(err, dbconnection) {
+     if (err) throw handleError(err);
+     ///
+     console.log('Successfully connected');
+ 
+     ///
+     User.find( querysql ).exec( function(err, users) {
+         if (err) throw handleError(err);
+         ///
+         console.log('User model - Successfully query');
+         console.log(users.length);
+         if(users.length == 1){
+             res.redirect('/');
+         }else{
+             res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
+             session.user = null;
+         }
+     } );  
+ });          
         } else {
             res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
         }
