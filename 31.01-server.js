@@ -1,7 +1,7 @@
 http = require("http");
 
 const hostname = '127.0.0.1';
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 server = http.createServer(
     (req, res) => {
