@@ -19,7 +19,7 @@
     "qrcode-svg": "^1.1.0",
     "qrcode": "^1.4.4"
   },
-  "devDependencies": {},
+ "start": "node 31.01-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
