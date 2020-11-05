@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 var User = require('./models/user');
 
-const dbname = 'shop';
+const dbname = 'toyshop';
 const uri = 'mongodb://localhost:27017/' + dbname;
 
 const querysql = { 

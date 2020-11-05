@@ -3,7 +3,7 @@
 
 const MongoClient = require('mongodb').MongoClient;
 
-const dbname = 'shop';
+const dbname = 'toyshop';
 const uri = 'mongodb://localhost:27017/' + dbname;
 
 /// CÂU TRUY VẤN Ở ĐÂY !!!

@@ -56,6 +56,9 @@ var chattingLog = [];
 var adminControl = require('./controllers/admin');
 app.use('/admin', adminControl);
 
+var productControl = require('./controllers/product');
+app.use('/product', productControl);
+
 /// ------------------ Khai bao cac Control, hàm , ... 
 /// ..................................................
 app.get('/', homePage);
@@ -130,7 +133,36 @@ function orderPage(req, res) {
 
 
 /// ..................................................
-app.get('/', productPage);
+app.get('/product', productPage);
+function productPage(req, res) {
+    
+    if (session.user) 
+    {
+        MongoClient.connect(urldb, { useUnifiedTopology: true }, function(err, db) {
+            if (err) throw err;
+            var dbo = db.db("toyshop");
+            dbo.collection("product").find({}).toArray(function(err, productlist) {
+              if (err) throw err;
+              
+                res.render("pages/product-list",  {
+                    title: "ATN-Shop PRODUCT page", 
+                    username: session.user.username,
+                    products : productlist 
+                    , configHeader: configHeader , currpage: "Product"
+                    });
+                console.log('Found:', productlist);
+
+              db.close();
+            });
+          });
+                    
+
+        
+    } else {
+        res.redirect('/login');
+    }    
+    console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
+}
 
 /// ..................................................
 app.get('/user/create', createUserPage);
@@ -142,7 +174,7 @@ function createUserPage(req, res) {
                 password : req.query.password.trim()
             };
             session.user = accsubmit;
-            libDB.res_insertDB(MongoClient, urldb, "shop", "user",
+            libDB.res_insertDB(MongoClient, urldb, "toyshop", "user",
                 accsubmit, "pages/user_create", {title: "ATN-Shop create USER page" , configHeader: configHeader , currpage: "create User"}, "Notify", res );
             console.log("\t create ", accsubmit);
         } else {
