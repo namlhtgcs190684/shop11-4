@@ -29,6 +29,10 @@ const PORT = 8080;
 var urldb = configDB.localdb.urldb;
 const hostname = '127.0.0.1';
 const port = process.env.PORT || 8080;
+fastify.listen(process.env.PORT || 8080, function (err) {
+  if (err) throw err
+  console.log(`server listening on ${fastify.server.address().port}`)
+})
 
 
 
