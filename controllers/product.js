@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
-
+var session = require('express-session');
+var configHeader = require("../configs/config_Header");
 var mongoose = require('mongoose');
 var Product = require('../models/product');
 
-const dbname = 'shop';
+const dbname = 'toyshop';
 const uri = 'mongodb://localhost:27017/' + dbname;
 
 /// --- Code CONTROLLERs
@@ -14,14 +15,13 @@ router.use(function timeLog (req, res, next) {
 })
 
 /// ..................................................
-router.get('/', productPage);
+router.post('/', productPage);
     function productPage(req, res) {
-
         if (session.user) 
             {
                 MongoClient.connect(urldb, { useUnifiedTopology: true }, function(err, db) {
                     if (err) throw err;
-                    var dbo = db.db("shop");
+                    var dbo = db.db("toyshop");
                     dbo.collection("product").find({}).toArray(function(err, productlist) {
                       if (err) throw err;
                       
@@ -37,8 +37,6 @@ router.get('/', productPage);
                     });
                   });
                             
-        
-                
             } else {
                 res.redirect('/login');
             }    
