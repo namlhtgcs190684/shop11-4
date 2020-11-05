@@ -2,7 +2,7 @@
   "name": "shop",
   "version": "1.0.0",
   "description": "",
-  "main": "31.01-server.js",
+  "main": "62.1.mvc.js",
   "dependencies": {
     "atob": "^2.1.2",
     "body-parser": "^1.19.0",
@@ -19,7 +19,7 @@
     "qrcode-svg": "^1.1.0",
     "qrcode": "^1.4.4"
   },
- "start": "node 31.01-server.js",
+ "start": "node 62.1.mvc.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
