@@ -1,6 +1,6 @@
 
-function res_queryDB(MongoClient, urldb, dbname, collectionname, renderpage, params, resultname, res ) {
-    MongoClient.connect(urldb, { useUnifiedTopology: true }, function(err, db) {
+function res_queryDB(MongoClient, urldb, dbname='toyshop', collectionname= 'product', renderpage, params, resultname, res ) {
+    MongoClient.connect(urldb, function(err, db) {
         if (err) throw err;
         var dbo = db.db( dbname ); //"newshop" "product"
         dbo.collection( collectionname ).find({}).toArray(function(err, resultlist) {
@@ -16,8 +16,8 @@ function res_queryDB(MongoClient, urldb, dbname, collectionname, renderpage, par
 }
 
 
-function res_insertDB(MongoClient, urldb, dbname, collectionname, insertData, renderpage, params, resultname, res ) {
-    MongoClient.connect(urldb, { useUnifiedTopology: true }, function(err, db) {
+function res_insertDB(MongoClient, urldb, dbname ='toyshop', collectionname='Create-user', insertData, renderpage, params, resultname, res ) {
+    MongoClient.connect(urldb, function(err, db) {
         if (err) throw err;
         var dbo = db.db( dbname ); //"newshop" "product"
         dbo.collection( collectionname ).insertOne(insertData, function(err, xres) {
