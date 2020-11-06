@@ -23,7 +23,7 @@
   "devDependencies": {},
   "scripts": {
     "start": "node 31.01server.js",
-    
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC"
