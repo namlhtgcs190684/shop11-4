@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var session = require('express-session');
 var configHeader = require("../configs/config_Header");
 var mongoose = require('mongoose');
 var Product = require('../models/product');
+var session = require('express-session');
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, xcallback) {
@@ -25,7 +25,7 @@ router.use(function timeLog (req, res, next) {
 })
 
 /// ..................................................
-router.get('/', productPage);
+router.get('/', productPage);   
 function productPage(req, res) {
     
     if (session.user) 
@@ -56,6 +56,37 @@ function productPage(req, res) {
     }    
     console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
 }
+router.get('/view', productPage);
+function productPage1(req, res) {
+    if (session.user) 
+    {
+        var MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(uri, { useUnifiedTopology: true }, function(err, db) {
+            if (err) throw err;
+            var dbo = db.db("toyshop");
+            dbo.collection("product").find({}).toArray(function(err, productlist) {
+              if (err) throw err;
+              
+                res.render("pages/product-one",  {
+                    title: "ATN-Shop PRODUCT page", 
+                    username: session.user.username,
+                    products : productlist 
+                    , configHeader: configHeader , currpage: "Product"
+                    });
+                console.log('Found:', productlist);
+
+              db.close();
+            });
+          });
+                    
+
+        
+    } else {
+        res.redirect('/login');
+    }    
+    console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
+}
+
 /// ..................................................
 router.get('/list', listProductPage);
 function listProductPage(req, res) {
@@ -118,32 +149,8 @@ function createProductPage(req, res, next) {
     res.render("pages/product_create", {title: "ATN-Shop create PRODUCT page", Notify: "", configHeader: router.params.configHeader , currpage: "create Product" });
 }
 
-router.post('/delete',deleteProduct);
-router.get('/delete',deleteProduct);
-function deleteProduct(req,res){
-    xproduct1 = {
-        name: "",
-    };
-    if (req.body.name) {
-        xproduct1.name = req.body.name;
-    }
 
-    console.log(xproduct1);
-    if (xproduct1.name != "") {
-            var MongoClient = require('mongodb').MongoClient;
-            var url = 'mongodb://localhost:27017/' + dbname;
-            MongoClient.connect(url, function(err, db) {
-            if (err) throw err;
-            var dbo = db.db("toyshop");
-            var myquery = { name: xproduct1.name };
-            dbo.collection("product").deleteOne(myquery, function(err, obj) {
-                if (err) throw err;
-                console.log("1 document deleted");
-                db.close();
-            });
-            });
-    }
-    res.render("pages/product_delete", {title: "ATN-Shop Delete PRODUCT page", Notify: "", configHeader: router.params.configHeader , currpage: "Delete Product" });
-}
 /// --- EXports
 module.exports = router;
+
+

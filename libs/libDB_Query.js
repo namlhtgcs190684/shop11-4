@@ -1,6 +1,6 @@
 
-function res_queryDB(MongoClient, urldb, dbname='toyshop', collectionname= 'product', renderpage, params, resultname, res ) {
-    MongoClient.connect(urldb, function(err, db) {
+function res_queryDB(MongoClient, urldb, dbname='toyshop', collectionname = 'product', renderpage, params, resultname, res ) {
+    MongoClient.connect(urldb,  function(err, db) {
         if (err) throw err;
         var dbo = db.db( dbname ); //"newshop" "product"
         dbo.collection( collectionname ).find({}).toArray(function(err, resultlist) {
@@ -16,7 +16,7 @@ function res_queryDB(MongoClient, urldb, dbname='toyshop', collectionname= 'prod
 }
 
 
-function res_insertDB(MongoClient, urldb, dbname ='toyshop', collectionname='Create-user', insertData, renderpage, params, resultname, res ) {
+function res_insertDB(MongoClient, urldb, dbname= 'toyshop', collectionname = 'create-User', insertData, renderpage, params, resultname, res ) {
     MongoClient.connect(urldb, function(err, db) {
         if (err) throw err;
         var dbo = db.db( dbname ); //"newshop" "product"
