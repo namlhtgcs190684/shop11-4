@@ -10,5 +10,5 @@ server = http.createServer(
         res.end();
     }
 );
-.listen( process.env.PORT || 8080; 
+server.listen( process.env.PORT || 8080; 
   console.log('Server running at http://0.0.0.0:8080/');
