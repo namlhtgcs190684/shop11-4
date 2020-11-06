@@ -2,7 +2,7 @@
   "name": "toyshop",
   "version": "1.0.0",
   "description": "none",
-  "main": "71.0.mvc.js",
+  "main": "31.01server.js",
   "dependencies": {
     "atob": "^2.1.2",
     "bson": "^4.2.0",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node 71.0.mvc.js",
+    "start": "node 31.01server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
