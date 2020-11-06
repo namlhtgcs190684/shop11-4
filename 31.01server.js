@@ -10,6 +10,5 @@ server = http.createServer(
         res.end();
     }
 );
-server.listen( port, hostname, 
-    () => { console.log(' Server running: ',hostname, port ); }
-);
+.listen( process.env.PORT || 8080; 
+  console.log('Server running at http://0.0.0.0:8080/');
