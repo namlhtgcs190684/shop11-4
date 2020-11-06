@@ -3,12 +3,12 @@
 
 /// ------------------ Khai bao LIB de su dung
 var express = require('express');
-const bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieSession = require('cookie-session');
 var cookieParser = require('cookie-parser');
-const nodemailer = require('nodemailer');
 var router = express.Router();
+const bodyParser= require('body-parser');
+var multer = require('multer');
 
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
@@ -22,13 +22,12 @@ var QRCode = require("qrcode-svg");
 var atob = require('atob');
 
 
+
 /// ------------------ CONFIG
 var configHeader = require("./configs/config_Header");
 var configDB = require("./configs/config_DB");
 const PORT = 8080;
 var urldb = configDB.localdb.urldb;
-
-
 
 
 /// ------------------ Khai bao LIB tự viết
@@ -37,7 +36,7 @@ var libDB = require("./libs/libDB_Query");
 /// ------------------ Khai bao cac Folder Tĩnh, Session, Cookies
 app.use(express.static('public'));
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true}));   
+app.use(bodyParser.urlencoded({extended: true}));
 /// session
 app.use(session({
     resave: true, 
@@ -72,12 +71,7 @@ uploadControl.params = { configHeader: configHeader, configDB: configDB};
 var paymentControl = require('./controllers/payment');
 app.use('/payment', paymentControl);
 paymentControl.params = { configHeader: configHeader, configDB: configDB};
-
-var login = require('./controllers/login');
-app.use('/login',login);
-// Body parser Middleware
-app.use(bodyParser.urlencoded({extended:false}));
-app.use(bodyParser.json());
+// uploadControl.uploadStore = uploadStore;
 
 /// ------------------ Khai bao cac Control, hàm , ... 
 /// ..................................................
@@ -91,6 +85,9 @@ function homePage(req, res) {
     }    
     console.log("\n\t ... connect from ", req.connection.remoteAddress, req.headers.host);
 }
+
+
+
 
 /// ..................................................
 app.get('/chatting', chattingPage);
@@ -125,7 +122,7 @@ function chattingPage(req, res) {
 app.get('/order', orderPage);
 function orderPage(req, res) {
     var xcontent = "";
-        console.log('\t ... get ORDER INF ! ');
+    console.log('\t ... get ORDER INF ! ');
 
     var strtext = req.cookies.cart_itemlist;
     console.log('1 ',strtext);
@@ -144,15 +141,16 @@ function orderPage(req, res) {
     xcontent += "<BR>decodeURIComponent <p> " + strtext + "</p>";
     ///
     var itemlist  = JSON.parse(strtext);
+    console.log('1 ',strtext);
     console.log("\n\t ", xcontent);
     
     res.render("pages/order", {title: "ATN-Shop ORDER page", 
         content: xcontent , itemlist: itemlist,  // Object.values(itemlist)
         configHeader: configHeader  , currpage: "Order"  });
+
 }
 
 
-/// ..................................................
 
 /// ..................................................
 app.get('/user/create', createUserPage);
@@ -164,7 +162,7 @@ function createUserPage(req, res) {
                 password : req.query.password.trim()
             };
             session.user = accsubmit;
-            libDB.res_insertDB(MongoClient, urldb, "toyshop", "Create-user",
+            libDB.res_insertDB(MongoClient, urldb, "newshop", "user",
                 accsubmit, "pages/user_create", {title: "ATN-Shop create USER page" , configHeader: configHeader , currpage: "create User"}, "Notify", res );
             console.log("\t create ", accsubmit);
         } else {
@@ -173,6 +171,27 @@ function createUserPage(req, res) {
         console.log("\t /user/create ");
     } else {
         res.redirect('/login');
+    }
+}
+
+/// ..................................................
+app.get('/login', loginPage);
+function loginPage(req, res) {
+    if (session.user) {
+        res.redirect('/');
+    } else {
+        if (req.query.username && req.query.username.trim() != "") {
+            accsubmit = {
+                username : req.query.username.trim(),
+                password : req.query.password.trim()
+            };
+            session.user = accsubmit;
+            res.redirect('/');
+            console.log(accsubmit);
+        } else {
+            res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
+        }
+        console.log("\t login ", req.session);
     }
 }
 app.get('/feedback', (req,res) => {
@@ -187,7 +206,7 @@ app.post('/send' ,(req,res) => {
     var message = req.body.message;
     require('dotenv').config();
 
-const   mailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const log = console.log;
 let transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -198,7 +217,7 @@ let transporter = nodemailer.createTransport({
 });
 let mailOptions = {
     from: email, // TODO: email sender
-    to: 'nguyenphuc12a6@gmail.com' , // TODO: email receiver
+    to: 'namlh.lhtn@gmail.com' , // TODO: email receiver
     subject: subject,
     text: 'Họ và Tên: ' + name + ' Số điện thoại: ' + phone + '\n' + message
 };
@@ -214,54 +233,6 @@ transporter.sendMail(mailOptions, (err, data) => {
    
     
 });
-
-/// ..................................................
-app.get('/login', loginPage);
-function loginPage(req, res) {
-    if (session.user) {
-        res.redirect('/');
-    } else {
-        if (req.query.username && req.query.username.trim() != "") {
-            accsubmit = {
-                username : req.query.username.trim(),
-                password : req.query.password.trim()
-            };
-            session.user = accsubmit;
-                    /// npm install mongodb mongoose --save
-
- var mongoose = require('mongoose');
- var User = require('./models/user');
-
- const querysql = accsubmit;
- console.log(querysql);
- 
- mongoose.connect(urldb, { useNewUrlParser: true, useUnifiedTopology: true },
- function(err, dbconnection) {
-     if (err) throw handleError(err);
-     ///
-     console.log('Successfully connected');
- 
-     ///
-     User.find( querysql ).exec( function(err, users) {
-         if (err) throw handleError(err);
-         ///
-         console.log('User model - Successfully query');
-         console.log(users.length);
-         if(users.length == 1){
-             res.redirect('/');
-         }else{
-             res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
-             session.user = null;
-         }
-     } );  
- });          
-
-        } else {
-            res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
-        }
-        console.log("\t login ", req.session);
-    }
-}
 
 
 /// ..................................................

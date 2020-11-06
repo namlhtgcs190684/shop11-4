@@ -15,7 +15,7 @@
 
                 <H3> Create a NEW PRODUCT: </H3>
 		
-                <form action="/product/create" enctype="multipart/form-data" method="get">
+                <form action="/product/create" enctype="multipart/form-data" method="post">
 
                     <!-- id -->
                     <div class="form-group">
@@ -48,7 +48,7 @@
                     <!-- img -->
                     <div class="form-group">
                         <label for="img">Image</label>
-                        <input type="text" class="form-control" id="img" name="img" aria-describedby="imgHelp">
+                        <input type="file"  accept="image/*" class="form-control" id="img" name="img" aria-describedby="imgHelp" multiple  >
                         <small id="imgHelp" class="form-text text-muted"> img </small>
                     </div>
                     

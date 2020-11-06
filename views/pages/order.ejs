@@ -22,12 +22,13 @@
                             <th>Tên sản phẩm</th>
                             <th>Số lượng</th>
                             <th>Giá tiền</th>
-                            <th>tổng cộng</th>
-                            <th>check if you want to buy</th>
+                            <th>Tổng cộng</th>
+                            <th>Check If want to buy</th>
                           </tr>
                         </thead>
                         <tbody>
-                    <form action="/payment"method="Get">
+                    
+                            <form action="/payment" method="GET">
                         <%Object.keys(itemlist).forEach(function(item) { %>
                             <tr style="vertical-align:middle;align-items: center ;">
                                 <td style="vertical-align:middle;align-items: center ;"><%=itemlist[item].id%></td>
@@ -37,14 +38,13 @@
                                 <td style="vertical-align:middle;align-items: center ;"><%=itemlist[item].name%></td>
                                 <td style="vertical-align:middle;align-items: center ;"><%=itemlist[item].number%></td>
                                 <td style="vertical-align:middle;align-items: center ;"><%=itemlist[item].price%></td>
-                                
+
                                 <%const thanhtien = itemlist[item].price * itemlist[item].number%>
-                                <td style="vertical-align:middle;align-items: center ;"><%=thanhtien%></td>
+                                <td style="vertical-align:middle;align-items: center ;"><%=thanhtien%>> </td>
                                 <td><input style="margin-top: 22px;margin-left: 50px;" type="checkbox" name="price" value="<%=thanhtien%>"></td>
-                                
                             </tr>                   
                         <% }); %>
-                    </form>
+                       </form>
                         </tbody>
                     </table>
                 </div>

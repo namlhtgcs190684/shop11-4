@@ -2,7 +2,7 @@
   "name": "shop",
   "version": "1.0.0",
   "description": "",
-  "main": "31.01-server.js",
+  "main": "31.01server.js",
   "dependencies": {
     "atob": "^2.1.2",
     "body-parser": "^1.19.0",
@@ -22,9 +22,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node 31.01-server.js",
+    "start": "node 31.01server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-
   },
   "author": "",
   "license": "ISC"
