@@ -20,9 +20,8 @@
     "qrcode": "^1.4.4",
     "express-session": "^1.17.1"
   },
-  "devDependencies": {},
   "scripts": {
-    "start": "node 71.01.mvc.js",
+    "start": "node .\71.01.mvc.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
