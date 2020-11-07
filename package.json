@@ -22,7 +22,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node 31.01server.js",
+    "start": "node 71.01.mvc.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
