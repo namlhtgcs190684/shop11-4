@@ -26,7 +26,7 @@ var atob = require('atob');
 /// ------------------ CONFIG
 var configHeader = require("./configs/config_Header");
 var configDB = require("./configs/config_DB");
-const port = 8080;
+const PORT = 8081;
 var urldb = configDB.localdb.urldb;
 
 
@@ -116,11 +116,11 @@ function chattingPage(req, res) {
         res.redirect('/login');
     }  
 }
-
-
 /// ..................................................
 app.get('/order', orderPage);
 function orderPage(req, res) {
+    if (session.user) 
+    {
     var xcontent = "";
     console.log('\t ... get ORDER INF ! ');
 
@@ -149,50 +149,31 @@ function orderPage(req, res) {
         configHeader: configHeader  , currpage: "Order"  });
 
 }
-
+else {
+    res.redirect('/login');
+}    
+console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
+}
 
 
 /// ..................................................
 app.get('/user/create', createUserPage);
 function createUserPage(req, res) {
-    if (session.user) {
+    
         if (req.query.username && req.query.username.trim() != "") {
             accsubmit = {
                 username : req.query.username.trim(),
                 password : req.query.password.trim()
             };
             session.user = accsubmit;
-            libDB.res_insertDB(MongoClient, urldb, "toyshop", "user",
+            libDB.res_insertDB(MongoClient, urldb, "toyshop", "Create-user",
                 accsubmit, "pages/user_create", {title: "ATN-Shop create USER page" , configHeader: configHeader , currpage: "create User"}, "Notify", res );
             console.log("\t create ", accsubmit);
         } else {
             res.render("pages/user_create", {title: "ATN-Shop create USER page", Notify: "", configHeader: configHeader , currpage: "create User" });
         }
         console.log("\t /user/create ");
-    } else {
-        res.redirect('/login');
-    }
-}
-
-/// ..................................................
-app.get('/login', loginPage);
-function loginPage(req, res) {
-    if (session.user) {
-        res.redirect('/');
-    } else {
-        if (req.query.username && req.query.username.trim() != "") {
-            accsubmit = {
-                username : req.query.username.trim(),
-                password : req.query.password.trim()
-            };
-            session.user = accsubmit;
-            res.redirect('/');
-            console.log(accsubmit);
-        } else {
-            res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
-        }
-        console.log("\t login ", req.session);
-    }
+    
 }
 app.get('/feedback', (req,res) => {
     res.render("pages/feedback",  {title: "ATN-Shop feedback page",msg:'', configHeader: configHeader, currpage: "Feedback" });  
@@ -228,12 +209,32 @@ transporter.sendMail(mailOptions, (err, data) => {
         res.render("pages/feedback",  {title: "ATN-Shop feedback page",msg:"Feedback thành công!!!", configHeader: configHeader, currpage: "Feedback" });  
         return log('Email sent!!!');
     }
-    
 });
-   
-    
+  
+
 });
 
+
+/// ..................................................
+app.get('/login', loginPage);
+function loginPage(req, res) {
+    if (session.user) {
+        res.redirect('/');
+    } else {
+        if (req.query.username && req.query.username.trim() != "") {
+            accsubmit = {
+                username : req.query.username.trim(),
+                password : req.query.password.trim()
+            };
+            session.user = accsubmit;
+            res.redirect('/');
+            console.log(accsubmit)           
+        } else {
+            res.render("pages/login", {title: "ATN-Shop LOGIN page", configHeader: configHeader , currpage: "Login"  });
+        }
+        console.log("\t login ", req.session);
+    }
+}
 
 /// ..................................................
 app.get('/logout', logoutPage);
