@@ -16,7 +16,7 @@ var storage = multer.diskStorage({
 var uploadStore = multer({ storage: storage });
 
 const dbname = 'toyshop';
-const uri = mongodb+srv://toyshop1106:<password>@toyshopcluster.d0kt8.mongodb.net/<dbname>?retryWrites=true&w=majority;
+const uri = 'mongodb://localhost:27017/' + dbname;
 
 /// --- Code CONTROLLERs
 router.use(function timeLog (req, res, next) {
@@ -97,6 +97,8 @@ function listProductPage(req, res) {
 router.post('/create', uploadStore.array('img', 12),  createProductPage);
 router.get('/create', uploadStore.array('img', 12), createProductPage);
 function createProductPage(req, res, next) {
+    if (session.user) 
+    {
     xproduct = {
         id: "",
         name: "",
@@ -147,8 +149,11 @@ function createProductPage(req, res, next) {
     }
 
     res.render("pages/product_create", {title: "ATN-Shop create PRODUCT page", Notify: "", configHeader: router.params.configHeader , currpage: "create Product" });
+}else {
+    res.redirect('/login');
+}    
+console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
 }
-
 
 /// --- EXports
 module.exports = router;

@@ -17,7 +17,7 @@ var storage = multer.diskStorage({
 var uploadStore = multer({ storage: storage });
 
 const dbname = 'toyshop';
-const uri = mongodb+srv://toyshop1106:<password>@toyshopcluster.d0kt8.mongodb.net/<dbname>?retryWrites=true&w=majority;
+const uri = 'mongodb://localhost:27017/' + dbname;
 
 /// --- Code CONTROLLERs
 router.use(function timeLog (req, res, next) {
@@ -26,8 +26,16 @@ router.use(function timeLog (req, res, next) {
 })
 
 router.get('/', payment);
+
 function payment(req,res){
+    if (session.user) 
+    {
     var price = req.query.price;
     res.render("pages/payment", {title: "ATN-Shop Payment USER page", Notify: "",prices:price, configHeader: configHeader , currpage: "Payment" });
+}
+else {
+    res.redirect('/login');
+}    
+console.log("\n\t ... connect PRODUCT from ", req.connection.remoteAddress, req.headers.host);
 }
 module.exports = router;
