@@ -21,7 +21,7 @@
     "express-session": "^1.17.1"
   },
   "scripts": {
-    "start": "node .\71.01.mvc.js",
+    "start": "node ./71.01.mvc.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
